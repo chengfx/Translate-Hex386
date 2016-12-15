@@ -15,7 +15,7 @@ bool HEX386::setFilePaths(int fileNum, char** filePaths)
 	{
 		cerr << "too less argumenst" << endl;
 		for (int i = 0; i < fileNum; i++)
-			cout << "fileNum:" << fileNum << "  filePath£º" << filePaths[i] << endl;
+			cout << "fileNum:" << fileNum << "  filePathï¼š" << filePaths[i] << endl;
 		return false;
 	}
 	for (int i = 0; i < fileNum - 1; i++)
