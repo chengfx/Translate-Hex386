@@ -22,9 +22,10 @@ bool HEX386::readFiles(const std::vector<std::string>& filePaths)
 			fileContents.push_back(line);
 		in.close();
 	}
-	displayVector(fileContents);
+	//displayVector(fileContents);
 	extractInfos(fileContents);
-	//displayVector(extractedData);
+	//for(auto& data: extractedData)
+	//	displayVector(data);
 	return true;
 }
 
@@ -49,7 +50,7 @@ bool HEX386::extractInfos(const std::vector<std::string>& fileContents)
 		if(dataType == END_TYPE)
 		{
 			extractedData.push_back(tempVector);
-			//out << "\r\n";
+			tempVector.clear();
 			continue;
 		}
 		if (dataType != DATA_TYPE)
@@ -60,19 +61,11 @@ bool HEX386::extractInfos(const std::vector<std::string>& fileContents)
 		{
 			const int data = (char2hex(line[i]) << 4) + char2hex(line[i + 1]);
 			tempVector.push_back(data);
-			//out << data<<" ";
 		}
 	}
-	//extractedData.push_back(out.str());
 	return true;
 }
 
-void HEX386::displayVector(const std::vector<std::string>& fileContents)const
-{
-	std::cout << "vector contents are : " << std::endl;
-	for (auto& content : fileContents)
-		std::cout << content << std::endl;
-}
 
 int HEX386::char2hex(char num)const
 {
@@ -82,4 +75,22 @@ int HEX386::char2hex(char num)const
 		return 10 + static_cast<int>(num - 'a');
 	else if (num >= 'A'&& num <= 'F')
 		return 10 + static_cast<int>(num - 'A');
+	return -1;
+}
+
+template<typename T>
+void displayVector(const std::vector<T>& vector)
+{
+	std::cout << "vector contents are : " << std::endl;
+	for (const T& content : vector)
+		std::cout << content << " ";
+	std::cout << std::endl;
+}
+
+template<>
+void displayVector(const std::vector<std::string>& vector)
+{
+	std::cout << "vector contents are : " << std::endl;
+	for (auto& content : vector)
+		std::cout << content << std::endl;;
 }

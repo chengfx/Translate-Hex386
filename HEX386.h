@@ -23,7 +23,12 @@ private:
 
 	std::vector<std::vector<Byte>> extractedData;
 	bool extractInfos(const std::vector<std::string>& fileContents);    //extract data from HEX386 files.
-	void displayVector(const std::vector<std::string>& fileContents)const;
 	int char2hex(char num)const;
 };
+
+template<typename T>
+void displayVector(const std::vector<T>& vector);
+template<>
+void displayVector(const std::vector<std::string>& vector);
+
 #endif
