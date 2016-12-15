@@ -8,18 +8,22 @@ class HEX386
 {
 public:
 	HEX386() = default;
-	HEX386(int fileNum, char** filePaths);
-	void convertData();
+	typedef unsigned int Byte;
+	bool readFiles(const std::vector<std::string>& filePaths);       //read contents from files
+	bool writeFile(const std::string& filePath)const;       //write contents into file
+	//void convertData();     //convert data extracted from HEX386 files into what form we want
 	~HEX386() = default;
 private:
 	static const int DATA_TYPE = 0;   
 	static const int END_TYPE = 1;
 	static const int DATA_START = 9;
-	std::vector<std::string> srcFilePaths;
-	std::string destFilePath;
-	std::vector<std::string> fileContents;
-	bool setFilePaths(int fileNum, char** filePaths);
-	bool readFiles();
-	void extractInfos();
+	static const int DATA_POS_H = 1;
+	static const int DATA_POS_L = 2;
+	static const int DATA_TYPE_POS = 8;
+
+	std::vector<std::vector<Byte>> extractedData;
+	bool extractInfos(const std::vector<std::string>& fileContents);    //extract data from HEX386 files.
+	void displayVector(const std::vector<std::string>& fileContents)const;
+	int char2hex(char num)const;
 };
 #endif

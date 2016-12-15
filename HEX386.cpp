@@ -2,44 +2,84 @@
 #include <iostream>
 #include<fstream>
 #include<sstream>
-using namespace std;
 
-HEX386::HEX386(int fileNum, char** filePaths)
+bool HEX386::readFiles(const std::vector<std::string>& filePaths)
 {
-	if (setFilePaths(fileNum, filePaths) && readFiles());
-}
-
-bool HEX386::setFilePaths(int fileNum, char** filePaths)
-{
-	if (fileNum < 2)
-	{
-		cerr << "too less argumenst" << endl;
-		for (int i = 0; i < fileNum; i++)
-			cout << "fileNum:" << fileNum << "  filePathï¼š" << filePaths[i] << endl;
+	if (filePaths.empty())
 		return false;
-	}
-	for (int i = 0; i < fileNum - 1; i++)
-		srcFilePaths.push_back(filePaths[i]);
-	destFilePath = filePaths[fileNum - 1];
-	return true;
-}
-
-bool HEX386::readFiles()
-{
-	ifstream in;
-	for (auto& filePath : srcFilePaths)
+	std::vector<std::string> fileContents;
+	std::ifstream in;
+	for (auto &path : filePaths)
 	{
-		in.open(filePath);
+		in.open(path);
 		if (!in)
 		{
-			cerr << "file|" << filePath << " : can not be opened" << endl;
-			state = STATE::wrong;
+			std::cerr << "file|" << path << ": can not be opened " << std::endl;
 			return false;
 		}
-		string line;
+		std::string line;
 		while (getline(in, line))
-			srcFileContents.push_back(line);
+			fileContents.push_back(line);
 		in.close();
 	}
+	displayVector(fileContents);
+	extractInfos(fileContents);
+	//displayVector(extractedData);
 	return true;
+}
+
+bool HEX386::writeFile(const std::string& filePath)const
+{
+	return true;
+}
+
+bool HEX386::extractInfos(const std::vector<std::string>& fileContents)
+{
+	std::ostringstream out;
+	std::vector<Byte> tempVector;
+	for (const auto& line : fileContents)
+	{
+		//Èç¹û²»ÊÇ¿ªÍ·²»ÊÇ':'£¬¼ÌÐøÏÂÒ»ÐÐ
+		if (line[0] != ':')
+			continue;
+		//¼ÆËãÊý¾Ý¶Î³¤¶ÈºÍÊý¾Ý¶ÎÀàÐÍ
+		const int dataNum = (char2hex(line[DATA_POS_H]) << 4) + char2hex(line[DATA_POS_L]);
+		const int dataType = char2hex(line[DATA_TYPE_POS]);
+		//
+		if(dataType == END_TYPE)
+		{
+			extractedData.push_back(tempVector);
+			//out << "\r\n";
+			continue;
+		}
+		if (dataType != DATA_TYPE)
+			continue;
+		//
+		const int dataEnd = DATA_START + dataNum * 2;
+		for (int i = DATA_START; i < dataEnd; i = i + 2)
+		{
+			const int data = (char2hex(line[i]) << 4) + char2hex(line[i + 1]);
+			tempVector.push_back(data);
+			//out << data<<" ";
+		}
+	}
+	//extractedData.push_back(out.str());
+	return true;
+}
+
+void HEX386::displayVector(const std::vector<std::string>& fileContents)const
+{
+	std::cout << "vector contents are : " << std::endl;
+	for (auto& content : fileContents)
+		std::cout << content << std::endl;
+}
+
+int HEX386::char2hex(char num)const
+{
+	if (num >= '0' && num <= '9')
+		return static_cast<int>(num - '0');
+	else if (num >= 'a' && num <= 'f')
+		return 10 + static_cast<int>(num - 'a');
+	else if (num >= 'A'&& num <= 'F')
+		return 10 + static_cast<int>(num - 'A');
 }
