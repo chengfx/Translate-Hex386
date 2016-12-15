@@ -1,7 +1,6 @@
 #include<iostream>
 #include"HEX386.h"
-#include <string>
-#include <vector>
+
 
 int main(int argc, char ** argv)
 {
