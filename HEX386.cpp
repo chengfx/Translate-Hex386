@@ -1,7 +1,6 @@
 #include "HEX386.h"
 #include <iostream>
 #include<fstream>
-#include<sstream>
 
 bool HEX386::readFiles(const std::vector<std::string>& filePaths)
 {
@@ -29,15 +28,42 @@ bool HEX386::readFiles(const std::vector<std::string>& filePaths)
 	return true;
 }
 
-bool HEX386::writeFile(const std::string& filePath)const
+bool HEX386::writeFile(const std::string& filePath, int numdataType)const
 {
+	for (const auto& vector: extractedData)
+	{
+		if (vector.size() % numdataType != 0)
+		{
+			std::cerr << "the number of Bytes in vector can not be divied by " << numdataType
+				<< "\n so please check your data or change the numBytes" << std::endl;
+			return false;
+		}
+			
+	}
+	std::vector<std::vector<dataType>> convertedData;
+	convertData(extractedData, convertedData, numdataType);
+	//for(auto& data: convertedData)
+	//	displayVector(data);
+	std::ofstream out(filePath, std::ofstream::app);
+	if (!out)
+	{
+		std::cerr << "file|" << filePath << " : can not be opened" << std::endl;
+		return false;
+	}
+	for (auto& vector : convertedData)
+	{
+		for (auto& data : vector)
+		{
+			out << data << ' ';
+		}
+		out << std::endl;
+	}
 	return true;
 }
 
 bool HEX386::extractInfos(const std::vector<std::string>& fileContents)
 {
-	std::ostringstream out;
-	std::vector<Byte> tempVector;
+	std::vector<dataType> tempVector;
 	for (const auto& line : fileContents)
 	{
 		//如果不是开头不是':'，继续下一行
@@ -66,6 +92,21 @@ bool HEX386::extractInfos(const std::vector<std::string>& fileContents)
 	return true;
 }
 
+void HEX386::convertData(const std::vector<std::vector<dataType>>& srcVectors, std::vector<std::vector<dataType>>& destVectors, const int numdataType)const
+{
+	for (const auto& vector : extractedData)
+	{
+		std::vector<dataType> data;
+		for (dataType i = 0; i < vector.size(); i = i + numdataType)
+		{
+			dataType sum = 0;
+			for (int j = 0; j < numdataType; j++)
+				sum = ((vector[i + j]) << (j * 8)) | (sum);
+			data.push_back(sum);
+		}
+		destVectors.push_back(data);
+	}
+}
 
 int HEX386::char2hex(char num)const
 {
