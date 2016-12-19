@@ -27,7 +27,14 @@ private:
 };
 
 template<typename T>
-void displayVector(const std::vector<T>& vector);
+void displayVector(const std::vector<T>& vector)
+{
+	std::cout << "vector contents are : " << std::endl;
+	for (const T& content : vector)
+		std::cout << content << " ";
+	std::cout << std::endl;
+}
+
 template<>
 void displayVector(const std::vector<std::string>& vector);
 
